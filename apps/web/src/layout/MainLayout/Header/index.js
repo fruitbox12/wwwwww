@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
 import { useState } from 'react'
-
+import { signOut } from 'next-auth/react'
 import { useTheme } from '@mui/material/styles'
 import { Avatar, Box, ButtonBase, Switch, TextField } from '@mui/material'
 import { styled } from '@mui/material/styles'
@@ -122,6 +122,12 @@ const Header = ({ handleLeftDrawerToggle }) => {
                 />
             </Box>
             <Box sx={{ flexGrow: 1 }} />
+            <button
+                onClick={() => signOut()}
+                style={{ background: '#f36', color: '#fff', border: 'none', cursor: 'pointer', padding: '5px 20px' }}
+            >
+                Logout
+            </button>
             <MaterialUISwitch checked={isDark} onChange={changeDarkMode} />
         </>
     )

@@ -1,7 +1,4 @@
-'use client'
 import { useCallback, useEffect } from 'react'
-
-// https://stackoverflow.com/questions/71572678/react-router-v-6-useprompt-typescript
 
 export function useBlocker(blocker, when = true) {
     useEffect(() => {

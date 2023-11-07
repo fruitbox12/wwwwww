@@ -15,7 +15,7 @@ const dashboard = {
             id: 'workflows',
             title: 'Threads',
             type: 'item',
-            url: '/',
+            url: '/dashboard',
             icon: icons.IconHierarchy,
             breadcrumbs: true
         },

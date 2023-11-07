@@ -1,11 +1,9 @@
-// import { createPortal } from 'react-dom'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 import useConfirm from 'hooks/useConfirm'
 import { StyledButton } from 'ui-component/StyledButton'
 
 const ConfirmDialog = () => {
     const { onConfirm, onCancel, confirmState } = useConfirm()
-    // const portalElement = document.getElementById('portal')
 
     const component = confirmState.show ? (
         <Dialog

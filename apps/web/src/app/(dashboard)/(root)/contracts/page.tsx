@@ -1,5 +1,5 @@
 import React from 'react'
-import Contracts from '../../../views/contracts'
+import Contracts from 'views/contracts'
 
 const ContractsPage = () => {
     return <Contracts />
