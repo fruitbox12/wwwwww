@@ -8,8 +8,8 @@ import { styled, useTheme } from '@mui/material/styles'
 import { AppBar, Box, CssBaseline, Toolbar, useMediaQuery } from '@mui/material'
 
 // project imports
-import Header from '../../layout/MainLayout/Header'
-import Sidebar from '../../layout/MainLayout/Sidebar'
+import Header from 'layout/MainLayout/Header'
+import Sidebar from 'layout/MainLayout/Sidebar'
 import { drawerWidth } from 'store/constant'
 import { SET_MENU } from 'store/actions'
 

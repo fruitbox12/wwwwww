@@ -65,8 +65,6 @@ const Canvas = (props) => {
     const { canvasId: workflowShortId } = props
     const theme = useTheme()
     const router = useRouter()
-    // const URLpath = document.location.pathname.toString().split('/')
-    // const workflowShortId = URLpath[URLpath.length - 1] && URLpath[URLpath.length - 1].startsWith('W') ? URLpath[URLpath.length - 1] : ''
 
     const { confirm } = useConfirm()
 
