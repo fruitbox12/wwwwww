@@ -128,12 +128,14 @@ const Wallets = () => {
                     </Stack>
                 )}
             </MainCard>
-            <WalletDialog
-                show={showDialog}
-                dialogProps={dialogProps}
-                onCancel={() => setShowDialog(false)}
-                onConfirm={onConfirm}
-            ></WalletDialog>
+            {typeof window !== 'undefined' && (
+        <WalletDialog
+          show={showDialog}
+          dialogProps={dialogProps}
+          onCancel={() => setShowDialog(false)}
+          onConfirm={onConfirm}
+        />
+      )}
         </>
     )
 }
