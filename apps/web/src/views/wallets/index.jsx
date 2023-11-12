@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-
+import Image from 'next/image'
 // material-ui
 import { Grid, Box, Stack } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
@@ -22,7 +22,6 @@ import walletsApi from 'api/wallets'
 
 // Hooks
 import useApi from 'hooks/useApi'
-import Image from 'next/image'
 
 // ==============================|| WALLETS ||============================== //
 
@@ -129,12 +128,14 @@ const Wallets = () => {
                     </Stack>
                 )}
             </MainCard>
-            <WalletDialog
-                show={showDialog}
-                dialogProps={dialogProps}
-                onCancel={() => setShowDialog(false)}
-                onConfirm={onConfirm}
-            ></WalletDialog>
+            {typeof window !== 'undefined' && (
+        <WalletDialog
+          show={showDialog}
+          dialogProps={dialogProps}
+          onCancel={() => setShowDialog(false)}
+          onConfirm={onConfirm}
+        />
+      )}
         </>
     )
 }

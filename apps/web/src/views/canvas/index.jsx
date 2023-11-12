@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import ReactFlow, { addEdge, Controls, Background, useNodesState, useEdgesState } from 'reactflow'
 import 'reactflow/dist/style.css'
+import dynamic from 'next/dynamic';
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
@@ -23,7 +24,6 @@ import CanvasNode from './CanvasNode'
 import ButtonEdge from './ButtonEdge'
 import CanvasHeader from './CanvasHeader'
 import AddNodes from './AddNodes'
-import EditNodes from './EditNodes'
 import ConfirmDialog from 'ui-component/dialog/ConfirmDialog'
 import TestWorkflowDialog from 'ui-component/dialog/TestWorkflowDialog'
 
@@ -58,6 +58,10 @@ import { baseURL } from 'store/constant'
 
 const nodeTypes = { customNode: CanvasNode }
 const edgeTypes = { buttonedge: ButtonEdge }
+const EditNodes = dynamic(() => import('./EditNodes'), {
+  ssr: false,
+});
+
 
 // ==============================|| CANVAS ||============================== //
 
@@ -65,8 +69,6 @@ const Canvas = (props) => {
     const { canvasId: workflowShortId } = props
     const theme = useTheme()
     const router = useRouter()
-    // const URLpath = document.location.pathname.toString().split('/')
-    // const workflowShortId = URLpath[URLpath.length - 1] && URLpath[URLpath.length - 1].startsWith('W') ? URLpath[URLpath.length - 1] : ''
 
     const { confirm } = useConfirm()
 
