@@ -1,5 +1,7 @@
 import React from 'react'
-import Wallets from 'views/wallets'
+import dynamic from 'next/dynamic';
+
+const Wallets: React.FC = dynamic(() => import('views/wallets'), { ssr: false }) as React.FC;
 
 const WalletsPage = () => {
     return (
