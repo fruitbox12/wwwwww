@@ -79,10 +79,9 @@ const Workflows = () => {
 
     const [isLoading, setLoading] = useState(true)
     const [images, setImages] = useState({})
-    const userEmail = session?.user?.email;
 
     const [isHorizontal, setIsHorizontal] = useState(customization.isHorizontal)
-const getAllWorkflowsApi = useApi(() => workflowsApi.getAllWorkflows(userEmail));
+const getAllWorkflowsApi = useApi(() => workflowsApi.getAllWorkflows());
 
 
     const addNew = () => {
