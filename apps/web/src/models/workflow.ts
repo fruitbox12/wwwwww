@@ -22,7 +22,7 @@ const workflowSchema = new Schema(
             default: false // Default value
         },
         userId: {
-            type: String // Reference to User model
+            type: String,
             required: true
         }
     },
