@@ -1,6 +1,6 @@
 import client from './client'
 
-const getAllWorkflows = () => client.get('/workflows')
+const getAllWorkflows = () => axios.get('/api/workflowUser?${userId}')
 
 const getSpecificWorkflow = (shortId) => client.get(`/workflows/${shortId}`)
 
