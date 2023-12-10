@@ -12,8 +12,6 @@ import { gridSpacing } from 'store/constant'
 import WorkflowEmptySVG from 'assets/images/workflow_empty.svg'
 import { SET_LAYOUT } from 'store/actions'
 import { StyledButton } from 'ui-component/StyledButton'
-import { useSession } from 'next-auth/react';
-import axios from 'axios'; // Import Axios for API requests
 
 // API
 import workflowsApi from 'api/workflows'
@@ -71,8 +69,6 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 // ==============================|| WORKFLOWS ||============================== //
 
 const Workflows = () => {
-    const { data: session, status } = useSession();
-
     const router = useRouter()
     const theme = useTheme()
     const dispatch = useDispatch()
@@ -80,39 +76,9 @@ const Workflows = () => {
 
     const [isLoading, setLoading] = useState(true)
     const [images, setImages] = useState({})
-
     const [isHorizontal, setIsHorizontal] = useState(customization.isHorizontal)
-    const fetchWorkflows = async () => {
-        try {
-            const response = await axios.post('https://us-west-2.aws.data.mongodb-api.com/app/data-iwkwk/endpoint/data/v1/action/aggregate', {
-                dataSource: "Cluster0",
-                database: "test",
-                collection: "workflow",
-                pipeline: [
-                    { "$match": { "userId": "dylanwong007@gmail.com" } },
-                    { "$lookup": { "from": "executions", "localField": "shortId", "foreignField": "workflowShortId", "as": "execution" } },
-                    { "$addFields": { "executionCount": { "$size": "$execution" } } }
-                ]
-            }, {
-                headers: {
-                    apiKey: '6uEU4gDFxatldVT39NxpbqRxk7eNGUo2z5R18xhBju2iSEzNl6FxPN1TAwHq86N5',
-                    'Content-Type': 'application/ejson',
-                    'Accept': 'application/json'
-                }
-            });
 
-            setWorkflows(response.data); // Update your state with the response data
-        } catch (error) {
-            console.error('Error fetching workflows:', error);
-            // Handle error appropriately
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchWorkflows();
-    }, []);
+    const getAllWorkflowsApi = useApi(workflowsApi.getAllWorkflows)
 
     const addNew = () => {
         router.push('/canvas')
@@ -123,9 +89,19 @@ const Workflows = () => {
     }
 
     useEffect(() => {
-        if (fetchWorkflows.data) {
+        getAllWorkflowsApi.request()
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    useEffect(() => {
+        setLoading(getAllWorkflowsApi.loading)
+    }, [getAllWorkflowsApi.loading])
+
+    useEffect(() => {
+        if (getAllWorkflowsApi.data) {
             try {
-                const workflows = fetchWorkflows.data
+                const workflows = getAllWorkflowsApi.data
                 const images = {}
 
                 for (let i = 0; i < workflows.length; i += 1) {
@@ -146,7 +122,7 @@ const Workflows = () => {
                 console.error(e)
             }
         }
-    }, [fetchWorkflows.data])
+    }, [getAllWorkflowsApi.data])
 
     const handleSwapLayout = () => {
         dispatch({ type: SET_LAYOUT, isHorizontal: !isHorizontal })
