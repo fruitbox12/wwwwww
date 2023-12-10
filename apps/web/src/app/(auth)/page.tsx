@@ -3,7 +3,7 @@
 import React from 'react';
 import LoginScreen from './LoginScreen'; // Adjust the path as needed
 import { getSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
     const router = useRouter();
