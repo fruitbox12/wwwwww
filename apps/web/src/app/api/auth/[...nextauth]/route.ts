@@ -39,7 +39,6 @@ const authOptions: NextAuthOptions = {
             }
         })
     ],
-
     callbacks: {
         async signIn({ user, account }) {
             if (account?.provider === 'google') {
@@ -64,7 +63,7 @@ const authOptions: NextAuthOptions = {
                         if (res.ok) {
                             return true
                         }
-                    }     
+                    }
                 } catch (error) {
                     console.log(error)
                 }
@@ -72,8 +71,6 @@ const authOptions: NextAuthOptions = {
 
             return true
         }
-    }
-
     },
     session: {
         strategy: 'jwt'
