@@ -1,8 +1,4 @@
 import mongoose, { Schema, models } from 'mongoose';
- * @param {string | Date} prefix Identifies the Entity, 'W' for Workflow, 'E' for Execution
- * @param {Date} date The Date the ShortId was created
- * @returns {string} shortId
- */
 
      const RANDOM_LENGTH = 8
 const DICTIONARY_1 = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'
@@ -21,11 +17,7 @@ const DICTIONARY_3 = 'abcdefghijklmnopqrstuvwxyz0123456789'
     return `${prefix}${sanitizedDate}-${randomPart}`
 }
 
-/**
- * Format a date for use in the short id DDMMMYY with no hyphens
- * @param {Date} date
- * @returns {string} the sanitized date as string ie: 10JAN21
- */
+
  const formatDateForShortID = (date: Date): string => {
     const localDate = moment(date)
     return localDate.format('DDMMMYY').toUpperCase()
