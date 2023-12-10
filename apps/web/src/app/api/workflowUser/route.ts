@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectMongoDB } from 'libs/database'; // Import the connectMongoDB function
-import Workflow, { IWorkflowDocument } from './workflow'; // Import the Workflow model
+import Workflow, { IWorkflowDocument } from 'models/workflow'; // Import the Workflow model
 import { ObjectId } from 'mongodb'
 
 interface IWorkflow {
