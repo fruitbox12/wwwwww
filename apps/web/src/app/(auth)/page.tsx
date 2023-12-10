@@ -1,31 +1,14 @@
-// pages/login.js (or wherever you want this page to be)
+import React from 'react'
+import LoginScreen from './login.screen'
+import { getServerSession } from 'next-auth'
+import { redirect } from 'next/navigation'
 
-import React from 'react';
-import LoginScreen from './LoginScreen'; // Adjust the path as needed
-import { getSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+const LoginPage = async () => {
+    const session = await getServerSession()
 
-const LoginPage = () => {
-    const router = useRouter();
+    if (session) redirect('/dashboard')
 
-    return <LoginScreen />;
-};
-
-export async function getServerSideProps(context) {
-    const session = await getSession({ req: context.req });
-
-    if (session) {
-        return {
-            redirect: {
-                destination: '/dashboard',
-                permanent: false,
-            },
-        };
-    }
-
-    return {
-        props: {}, // will be passed to the page component as props
-    };
+    return <LoginScreen />
 }
 
-export default LoginPage;
+export default LoginPage
