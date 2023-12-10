@@ -3,9 +3,7 @@ import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
+
 
   try {
     const API_KEY = '6uEU4gDFxatldVT39NxpbqRxk7eNGUo2z5R18xhBju2iSEzNl6FxPN1TAwHq86N5'; // Replace with your API key
