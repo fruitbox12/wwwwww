@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectMongoDB } from './libs/database'; // Import the connectMongoDB function
+import { connectMongoDB } from 'libs/database'; // Import the connectMongoDB function
 
 interface IWorkflow {
     _id: ObjectId
