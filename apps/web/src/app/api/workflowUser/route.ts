@@ -16,69 +16,38 @@ export default async function handler(req: NextRequest) {
 }
 
 async function handleGet(req: NextRequest) {
-    const { shortId } = req.query;
+    const { shortId, userId } = req.query; // Extract userId from query parameters
 
     if (shortId) {
         // GET a specific workflow by shortId
-        return getSpecificWorkflow(shortId);
+        return getSpecificWorkflow(shortId, userId);
     } else {
-        // GET all workflows
-        return getAllWorkflows();
+        // GET all workflows for a specific user
+        return getAllWorkflows(userId);
     }
 }
 
-async function getAllWorkflows() {
+async function getAllWorkflows(userId) {
+    const query = userId ? { userId } : {}; // Filter by userId if provided
     const workflows = await Workflow
-        .aggregate([
-            {
-                $lookup: {
-                    from: 'execution',
-                    localField: 'shortId',
-                    foreignField: 'workflowShortId',
-                    as: 'execution'
-                }
-            },
-            {
-                $addFields: {
-                    executionCount: {
-                        $size: '$execution'
-                    }
-                }
-            }
-        ])
-        .toArray();
+        .find(query) // Adjusted to use find with potential userId filter
+        .exec();
 
     return NextResponse.json(workflows);
 }
 
-async function getSpecificWorkflow(shortId) {
-    const workflows = await Workflow
-        .aggregate([
-            {
-                $match: {
-                    shortId
-                }
-            },
-            {
-                $lookup: {
-                    from: 'execution',
-                    localField: 'shortId',
-                    foreignField: 'workflowShortId',
-                    as: 'execution'
-                }
-            },
-            {
-                $addFields: {
-                    executionCount: {
-                        $size: '$execution'
-                    }
-                }
-            }
-        ])
-        .toArray();
+async function getSpecificWorkflow(shortId, userId) {
+    const query = { shortId };
+    if (userId) {
+        query.userId = userId; // Add userId to query if provided
+    }
 
-    if (workflows.length) {
-        return NextResponse.json(workflows[0]);
+    const workflow = await Workflow
+        .findOne(query) // Adjusted to findOne with potential userId filter
+        .exec();
+
+    if (workflow) {
+        return NextResponse.json(workflow);
     } else {
         return NextResponse.json({ message: `Workflow ${shortId} not found` }, { status: 404 });
     }
