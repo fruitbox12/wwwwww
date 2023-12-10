@@ -71,18 +71,7 @@ const authOptions: NextAuthOptions = {
             }
 
             return true
-        },
-           async jwt({ token, user }) {
-        // If the user object exists, it's a sign-in event
-        if (user) {
-            token.email = user.email; // Add the user's email to the JWT token
         }
-        return token;
-    },
-    async session({ session, token }) {
-        // Add the email from the JWT token to the session object
-        session.user.email = token.email;
-        return session;
     }
 
     },
