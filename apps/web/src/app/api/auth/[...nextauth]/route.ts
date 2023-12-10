@@ -70,8 +70,19 @@ const authOptions: NextAuthOptions = {
             }
 
             return true
+        },
+          async jwt({ token, user }) {
+        if (user) {
+            token.email = user.email; // Add email to the JWT token
         }
+        return token;
     },
+    async session({ session, token }) {
+        session.user.email = token.email; // Retrieve email from JWT and add it to the session
+        return session;
+    }
+    },
+    
     session: {
         strategy: 'jwt'
     },
