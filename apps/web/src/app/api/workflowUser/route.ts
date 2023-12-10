@@ -1,71 +1,67 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { connectMongoDB } from 'libs/database';
-import Workflow from 'models/workflow';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { MongoClient, Db } from 'mongodb';
 
-export default async function handler(req: NextRequest) {
-    await connectMongoDB();
-
-    switch (req.method) {
-        case 'GET':
-            return handleGet(req);
-        case 'POST':
-            return handlePost(req);
-        default:
-            return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
-    }
+interface IWorkflow {
+    _id: ObjectId
+    shortId: string
+    name: string
+    flowData: string
+    deployed: boolean
+    updatedDate: Date
+    createdDate: Date
 }
 
-async function handleGet(req: NextRequest) {
-    const { shortId, userId } = req.query; // Extract userId from query parameters
 
-    if (shortId) {
-        // GET a specific workflow by shortId
-        return getSpecificWorkflow(shortId, userId);
-    } else {
-        // GET all workflows for a specific user
-        return getAllWorkflows(userId);
-    }
+interface IWorkflowResponse extends IWorkflow {
+    execution: IExecution
+    executionCount: number
 }
 
-async function getAllWorkflows(userId) {
-    const query = userId ? { userId } : {}; // Filter by userId if provided
-    const workflows = await Workflow
-        .find(query) // Adjusted to use find with potential userId filter
-        .exec();
 
-    return NextResponse.json(workflows);
+let db: Db;
+
+async function connectToDatabase() {
+  if (!db) {
+    const client = new MongoClient(process.env.MONGODB_URI);
+    await client.connect();
+    db = client.db(process.env.DB_NAME);
+  }
+  return db;
 }
 
-async function getSpecificWorkflow(shortId, userId) {
-    const query = { shortId };
-    if (userId) {
-        query.userId = userId; // Add userId to query if provided
-    }
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const db = await connectToDatabase();
 
-    const workflow = await Workflow
-        .findOne(query) // Adjusted to findOne with potential userId filter
-        .exec();
+    const userId = req.query.userId as string; // Assuming you're passing userId as a query parameter
 
-    if (workflow) {
-        return NextResponse.json(workflow);
-    } else {
-        return NextResponse.json({ message: `Workflow ${shortId} not found` }, { status: 404 });
-    }
-}
+    const workflows: IWorkflowResponse[] = await db.collection('workflow')
+      .aggregate([
+        {
+          $match: {
+            userId: userId // Filter workflows by userId
+          }
+        },
+        {
+          $lookup: {
+            from: 'execution',
+            localField: 'shortId',
+            foreignField: 'workflowShortId',
+            as: 'execution'
+          }
+        },
+        {
+          $addFields: {
+            executionCount: {
+              $size: '$execution'
+            }
+          }
+        }
+      ]).toArray();
 
-async function handlePost(req: NextRequest) {
-    try {
-        const { userId, ...body } = await req.json();
-
-        const newWorkflow = new Workflow();
-        Object.assign(newWorkflow, body, { userId });
-
-        const savedWorkflow = await Workflow.create(newWorkflow);
-        await Workflow.save(savedWorkflow);
-
-        return NextResponse.json({ message: 'Workflow created', data: savedWorkflow }, { status: 201 });
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ message: 'Error creating workflow.' }, { status: 500 });
-    }
+    res.status(200).json(workflows);
+  } catch (error) {
+    console.error('Failed to fetch workflows:', error);
+    res.status(500).json({ error: 'Failed to fetch workflows' });
+  }
 }
