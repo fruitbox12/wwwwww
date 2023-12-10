@@ -4,8 +4,8 @@ import { Handle, Position } from 'reactflow'
 import { useSelector } from 'react-redux'
 // material-ui
 import { styled, useTheme } from '@mui/material/styles'
-import { Avatar, Box, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import { Avatar, Box, Typography, Modal, TextField, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react'
 import nodesApi from 'api/nodes'
 import { useMediaQuery } from '@mui/material'
 
@@ -20,22 +20,16 @@ import { baseURL } from 'store/constant'
 import AddNodes from './AddNodes'
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
-    background: 'rgba(255, 255, 255, 0.1)', // Opacity glass effect
-    backdropFilter: 'blur(10px)',
+    background: theme.palette.card.main,
     color: theme.darkTextPrimary,
-    border: 'solid 1px rgba(255, 255, 255, 0.2)', // Add a slight border
-    width: '100px',
-    height: '100px',
+    border: 'solid 1px',
+    width: '200px',
+    height: 'auto',
     padding: '10px',
-    boxShadow: 'inset 4px 4px 10px 0 rgba(0, 0, 0, 0.25), inset -4px -4px 10px 0 rgba(255, 255, 255, 0.3), 0 0 15px rgba(0, 128, 255, 0.5)', // Inner shadow and blue glow
+    boxShadow: '0 2px 14px 0 rgb(32 40 45 / 8%)',
     '&:hover': {
-        background: 'rgba(255, 255, 255, 0.2)', // Make hover slightly more opaque
-        borderColor: 'rgba(0, 128, 255, 0.5)', // Blue glow on hover
-        boxShadow:
-            'inset 4px 4px 10px 0 rgba(0, 0, 0, 0.25), inset -4px -4px 10px 0 rgba(255, 255, 255, 0.3), 0 0 30px rgba(0, 128, 255, 0.7)' // Stronger blue glow on hover
-    },
-    '&:hover .add-nodes': {
-        opacity: 1
+        background: theme.palette.card.hover,
+        borderColor: theme.palette.primary.main
     }
 }))
 
@@ -51,22 +45,60 @@ const AddNodesStyled = styled(AddNodes)(({ theme }) => ({
     marginRight: '5px' // Optional, adds extra spacing if needed
 }))
 
-const CanvasNode = ({ data }) => {
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)') // Add this line
+const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
 
-    const [selectedNode, setSelectedNode] = useState(null)
-    const theme = useTheme()
-    const customization = useSelector((state) => state.customization)
+const CanvasNode = ({ data }) => {
+    const theme = useTheme();
+    const [modalOpen, setModalOpen] = useState(false);
+    const [clickCount, setClickCount] = useState(0);
+    const [iconUrl, setIconUrl] = useState(data.iconUrl || `${baseURL}/api/v1/node-icon/${data.name}`);
+    const customization = useSelector((state) => state.customization);
+    const [selectedNode, setSelectedNode] = useState(null);
+
+    const handleCardClick = () => {
+        setClickCount(prevCount => prevCount + 1);
+    };
+    const handleIconChange = (newUrl) => {
+        setIconUrl(newUrl); // Update the state with the new URL
+        // Close the modal or other UI elements if necessary
+        handleModalClose();
+
+    };
+    
+    useEffect(() => {
+        if (clickCount === 5) {
+            setModalOpen(true);
+            setClickCount(0);
+        }
+    }, [clickCount]);
+
+    const handleModalClose = () => {
+        setModalOpen(false);
+    };
+
+  
     return (
         <>
-            <CardWrapper
+            <CardWrapper className="wrapper gradient" // Use TurboNode's class for styling
+ onClick={handleCardClick}
                 onMouseOver={() => setSelectedNode(data)}
                 content={false}
                 sx={{
                     borderColor: data.selected ? theme.palette.primary.main : theme.palette.text.secondary
                 }}
                 border={false}
-            >
+            >              <div className="inner"> {/* TurboNode's inner class for styling */}
+
                 {data && data.outputResponses && data.outputResponses.submit && (
                     <Avatar
                         variant='rounded'
@@ -120,7 +152,7 @@ const CanvasNode = ({ data }) => {
                             }}
                         />
                     ))}
-                    <div
+                    <div 
                         style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -151,15 +183,15 @@ const CanvasNode = ({ data }) => {
                                 }}
                             >
                                 <img
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'contain',
-                                        filter: customization.isDarkMode ? 'invert(1)' : 'invert(0)' // Corrected line
-                                    }}
-                                    src={`${baseURL}/api/v1/node-icon/${data.name}`}
-                                    alt='Notification'
-                                />
+        style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            filter: customization.isDarkMode ? 'invert(1)' : 'invert(0)'
+        }}
+        src={iconUrl} // Use the iconUrl state
+        alt='Node Icon'
+    />
                             </div>
                             <Typography
                                 sx={{
@@ -189,8 +221,24 @@ const CanvasNode = ({ data }) => {
                             }}
                         />
                     ))}
+                </Box>                </div>
+
+            </CardWrapper>    <Modal open={modalOpen} onClose={handleModalClose}>
+                <Box sx={modalStyle}>
+                    <Typography variant="h6" component="h2">
+                        Change Icon URL
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        label="Icon URL"
+                        value={iconUrl}
+                        onChange={(e) => setIconUrl(e.target.value)}
+                        margin="normal"
+                    />
+                    <Button variant="contained" onClick={handleIconChange}>
+                    </Button>
                 </Box>
-            </CardWrapper>
+            </Modal>
         </>
     )
 }
