@@ -12,6 +12,7 @@ import { gridSpacing } from 'store/constant'
 import WorkflowEmptySVG from 'assets/images/workflow_empty.svg'
 import { SET_LAYOUT } from 'store/actions'
 import { StyledButton } from 'ui-component/StyledButton'
+import { useSession } from 'next-auth/react';
 
 // API
 import workflowsApi from 'api/workflows'
@@ -69,6 +70,8 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 // ==============================|| WORKFLOWS ||============================== //
 
 const Workflows = () => {
+    const { data: session, status } = useSession();
+
     const router = useRouter()
     const theme = useTheme()
     const dispatch = useDispatch()
@@ -76,9 +79,11 @@ const Workflows = () => {
 
     const [isLoading, setLoading] = useState(true)
     const [images, setImages] = useState({})
-    const [isHorizontal, setIsHorizontal] = useState(customization.isHorizontal)
+    const userEmail = session?.user?.email;
 
-    const getAllWorkflowsApi = useApi(workflowsApi.getAllWorkflows)
+    const [isHorizontal, setIsHorizontal] = useState(customization.isHorizontal)
+const getAllWorkflowsApi = useApi(() => workflowsApi.getAllWorkflows(userEmail));
+
 
     const addNew = () => {
         router.push('/canvas')
