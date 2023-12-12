@@ -6,11 +6,26 @@ import { signIn } from 'next-auth/react'
 
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-
+import { useEffect } from 'react'
+import Helmet from 'react-helmet'
 export default function LoginScreen() {
     const { handleSubmit, register } = useForm()
     const router = useRouter()
-
+    useEffect(() => {
+        const modifyClassNames = (windowObj: Window & typeof globalThis, documentObj: Document): void => {
+          const rootElement = documentObj.documentElement;
+          const modifier = " w-mod-";
+      
+          rootElement.className += modifier + "js";
+      
+          if ("ontouchstart" in windowObj || (windowObj.DocumentTouch && documentObj instanceof DocumentTouch)) {
+            rootElement.className += modifier + "touch";
+          }
+        };
+      
+        modifyClassNames(window, document);
+      }, []);
+        
     const onSubmit = async (data: any) => {
         try {
             const res = await signIn('credentials', {
@@ -28,21 +43,41 @@ export default function LoginScreen() {
             console.error(error)
         }
     }
+    const handleGoogleSignIn = async () => {
+        try {
+            const res = await signIn('google', { callbackUrl: '/dashboard', redirect: false })
+            if (res?.error) {
+                toast.error('Error signing in with Google')
+                return
+            }
+            router.replace('/dashboard')
+        } catch (error) {
+            console.error(error)
+            toast.error('An error occurred during sign-in')
+        }
+    }
+
     return (
         <>
-            <div className='flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8'>
-                <div className='sm:mx-auto sm:w-full sm:max-w-md'>
-                    {/* <img
-                        className='mx-auto h-10 w-auto'
-                        src='https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600'
-                        alt='Your Company'
-                    /> */}
-                    <h2 className='mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900'>Sign in to your account</h2>
+          
+      <div className='flex h-screen justify-center items-center'>
+                <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 1 }}>
+                    <video autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', zIndex: -1 }}>
+                        <source src="https://assets-global.website-files.com/6503aaeae86e4a56badc0309/654d66d3490aa2d4b25e705f_Weave%20Lines%20Video-transcode.webm" type="video/webm" />
+                    </video> 
+
+    <h1 style={{ position: 'absolute', right: 0, left: 1, top: '1em', color: 'white', fontWeight: 'bold', margin: '6em', fontSize: '6em' }}><div>    Login to Weave</div>
+ </h1>
+
+</div>
+<div className='flex h-screen justify-center items-center'>
+                <div className='sm:mx-auto sm:w-full sm:max-w-[480px]'>
+                    <div className='sm:rounded-lg sm:px-12'>
+
                 </div>
 
-                <div className='mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]'>
-                    <div className='bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12'>
-                        <form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
+                    <div className=' sm:rounded-lg sm:px-12'>
+                        <form className='justify-center items-center space-y-6' onSubmit={handleSubmit(onSubmit)}  style={{ zIndex: "0"}}>
                             <div>
                                 <label htmlFor='email' className='block text-sm font-medium leading-6 text-gray-900'>
                                     Email address
@@ -77,13 +112,13 @@ export default function LoginScreen() {
 
                             <div className='flex items-center justify-between'>
                                 <div className='text-sm leading-6'>
-                                    <Link href='/register' className='font-semibold text-indigo-600 hover:text-indigo-500'>
+                                    <Link href='/register' className='font-semibold text-black hover:text-indigo-500'>
                                         Don&apos;t have an account? Sign Up
                                     </Link>
                                 </div>
 
                                 <div className='text-sm leading-6'>
-                                    <Link href='#' className='font-semibold text-indigo-600 hover:text-indigo-500'>
+                                    <Link href='#' className='font-semibold text-black hover:text-indigo-500'>
                                         Forgot password?
                                     </Link>
                                 </div>
@@ -92,7 +127,7 @@ export default function LoginScreen() {
                             <div>
                                 <button
                                     type='submit'
-                                    className='flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+                                    className='flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
                                 >
                                     Sign in
                                 </button>
@@ -189,7 +224,9 @@ export default function LoginScreen() {
 
                                     <span className='text-sm font-semibold leading-6'>Continue with Google</span>
                                 </button>
-
+                                <div className='w-1/2'>
+               
+            </div>
                                 {/* <a
                                     href='#'
                                     className='flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]'
@@ -213,8 +250,13 @@ export default function LoginScreen() {
                             Start a 14 day free trial
                         </a>
                     </p> */}
-                </div>
-            </div>
+
+
+                </div> 
+
+
+</div></div>
+
         </>
     )
 }
